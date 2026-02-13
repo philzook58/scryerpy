@@ -1,0 +1,20 @@
+[package]
+name = "scryer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "scryer"
+crate-type = ["cdylib"]
+
+[dependencies]
+num-bigint = "0.4.6"
+num-rational = "0.4.2"
+ordered-float = "5.1.0"
+pyo3 = { version = "0.28.0", features = [
+    "num-rational",
+    "num-bigint",
+    "ordered-float",
+] }
+scryer-prolog = "0.10.0"
