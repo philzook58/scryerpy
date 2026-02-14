@@ -87,7 +87,7 @@ mod scryer {
         }
     }
 
-    #[pyclass(name = "Term", eq, hash, frozen, str, unsendable)]
+    #[pyclass(name = "Term", eq, hash, frozen, str, from_py_object, unsendable)]
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     pub enum PyTerm {
         /// An arbitrary precision integer.

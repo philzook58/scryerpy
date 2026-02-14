@@ -28,3 +28,9 @@ def test_scryer():
             assert y == 3.14
         case _:
             assert False, "Pattern match failed"
+
+
+def test_list_and_var():
+    machine = Machine()
+    machine.load_module_string("mymod", ":- use_module(library(lists)).")
+    assert machine.query_one("length([a, b, c], N).") == {"N": Term.Integer(3)}
