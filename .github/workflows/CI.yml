@@ -43,6 +43,10 @@ jobs:
           python-version: 3.x
       - name: Build wheels
         uses: PyO3/maturin-action@v1
+        env:
+          # ring's ARM assembly expects __ARM_ARCH during cross-compilation preprocessing.
+          CFLAGS_aarch64_unknown_linux_gnu: -D__ARM_ARCH=8
+          CFLAGS_armv7_unknown_linux_gnueabihf: -D__ARM_ARCH=7
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
