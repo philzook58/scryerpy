@@ -41,8 +41,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - name: install libssl-dev
-        run: sudo apt-get install -y libssl-dev
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -50,6 +48,19 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
+          before-script-linux: |
+            case "${{ matrix.target }}" in
+              "aarch64" | "armv7" | "s390x" | "ppc64le")
+                # NOTE: pypa/manylinux docker images are Debian based
+                sudo apt-get update
+                sudo apt-get install -y pkg-config libssl-dev
+                ;;
+              "x86" | "x86_64")
+                # NOTE: rust-cross/manylinux docker images are CentOS based
+                yum update -y
+                yum install -y openssl openssl-devel
+                ;;
+            esac
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
