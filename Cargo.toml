@@ -18,4 +18,3 @@ pyo3 = { version = "0.28.0", features = [
     "ordered-float",
 ] }
 scryer-prolog = "0.10.0"
-openssl = { version = "*", features = ["vendored"] }
