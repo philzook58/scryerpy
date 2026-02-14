@@ -17,4 +17,4 @@ pyo3 = { version = "0.28.0", features = [
     "num-bigint",
     "ordered-float",
 ] }
-scryer-prolog = "0.10.0"
+scryer-prolog = { version = "0.10.0", default-features = false }
