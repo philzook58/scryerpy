@@ -34,3 +34,34 @@ def test_list_and_var():
     machine = Machine()
     machine.load_module_string("mymod", ":- use_module(library(lists)).")
     assert machine.query_one("length([a, b, c], N).") == {"N": Term.Integer(3)}
+    assert machine.query_one("length(L, 3).") == {
+        "L": Term.List([Term.Var("_A"), Term.Var("_B"), Term.Var("_C")])
+    }
+    assert machine.query_one("length(L, N).") == {
+        "L": Term.List([]),
+        "N": Term.Integer(0),
+    }
+    assert machine.query_one("L = [foo, b, c], length(L, N).") == {
+        "L": Term.List([Term.Atom("foo"), Term.Atom("b"), Term.Atom("c")]),
+        "N": Term.Integer(3),
+    }
+    assert machine.query_one('L =  "hello".') == {"L": Term.String("hello")}
+
+
+def test_list_length():
+    machine = Machine()
+    # missing imports does not cause an error?
+    prog = """
+    :- use_module(library(clpz)).
+    list_length([], 0).
+    list_length([_|Ls], N) :-
+        N #> 0,
+        N #= N0 + 1,
+        list_length(Ls, N0).
+        """
+    machine.load_module_string("mymod2", prog)
+    assert machine.query_one("list_length([a, b, c], N).") == {"N": Term.Integer(3)}
+
+    # def call(predt: Term) -> Term:
+    #    return machine.query_one(f"call({}{t}).")
+    # call("")
