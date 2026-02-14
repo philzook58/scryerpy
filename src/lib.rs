@@ -20,9 +20,12 @@ mod scryer {
         match ans {
             LeafAnswer::True => Ok(Some(HashMap::new())),
             LeafAnswer::False => Ok(None),
-            LeafAnswer::Exception(e) => Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
-                "Prolog exception: {e:?}"
-            ))),
+            LeafAnswer::Exception(e) => {
+                let pyterm = PyTerm::from(e);
+                Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
+                    "Prolog exception: {pyterm}"
+                )))
+            }
             LeafAnswer::LeafAnswer { bindings, .. } => {
                 let mut vars = HashMap::with_capacity(bindings.len());
                 for (name, value) in bindings {
@@ -42,6 +45,14 @@ mod scryer {
             }
         }
 
+        fn load_module_filename(&mut self, module_name: &str, filename: &str) -> PyResult<()> {
+            let contents = std::fs::read_to_string(filename).map_err(|e| {
+                pyo3::exceptions::PyIOError::new_err(format!("Failed to read file: {e}"))
+            })?;
+            self.machine.load_module_string(module_name, contents);
+            return Ok(());
+        }
+
         fn load_module_string(&mut self, module_name: &str, program: &str) {
             self.machine.load_module_string(module_name, program);
         }
@@ -54,9 +65,12 @@ mod scryer {
             let mut qs = self.machine.run_query(query.to_owned());
             match qs.next() {
                 Some(Ok(ans)) => leafanswer_to_pyresult(ans),
-                Some(Err(term)) => Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
-                    "Prolog error term: {term:?}"
-                ))),
+                Some(Err(term)) => {
+                    let pyterm = PyTerm::from(term);
+                    Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
+                        "Prolog error term: {pyterm}"
+                    )))
+                }
                 None => Ok(None),
             }
         }
@@ -77,9 +91,10 @@ mod scryer {
                         }
                     }
                     Err(term) => {
+                        let pyterm = PyTerm::from(term);
                         return Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
-                            "Prolog error term: {term:?}"
-                        )))
+                            "Prolog error term: {pyterm}"
+                        )));
                     }
                 }
             }

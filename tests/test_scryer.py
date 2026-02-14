@@ -1,4 +1,5 @@
 from scryer import Machine, Term
+# https://www.scryer.pl/
 
 
 def test_scryer():
