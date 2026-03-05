@@ -4,6 +4,10 @@ Simple Maturin based python bindings to scryer prolog.
 
 This is distinct from <https://github.com/jjtolton/scrypy> which tries to be more cohesive between python and prolog
 
+```bash
+pip install kdrag-scryer
+```
+
 ```python
 from scryer import Machine, Term
 

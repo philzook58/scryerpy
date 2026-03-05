@@ -57,7 +57,12 @@ mod scryer {
             self.machine.load_module_string(module_name, program);
         }
 
-        fn query_one(
+        fn consult(&mut self, module_name: &str, program: &str) -> PyResult<()> {
+            self.machine.consult_module_string(module_name, program);
+            return Ok(());
+        }
+
+        fn query_once(
             &mut self,
             _py: Python<'_>,
             query: &str,
@@ -75,11 +80,16 @@ mod scryer {
             }
         }
 
-        fn query_all(
+        #[pyo3(signature = (query, limit=None))]
+        fn query(
             &mut self,
             _py: Python<'_>,
             query: &str,
+            limit: Option<usize>,
         ) -> PyResult<Vec<HashMap<String, PyTerm>>> {
+            if limit == Some(0) {
+                return Ok(Vec::new());
+            }
             let mut results = Vec::new();
             let mut qs = self.machine.run_query(query.to_owned());
             while let Some(ans) = qs.next() {
@@ -88,6 +98,9 @@ mod scryer {
                     Ok(ans) => {
                         if let Some(vars) = leafanswer_to_pyresult(ans)? {
                             results.push(vars);
+                            if limit.is_some_and(|max_results| results.len() >= max_results) {
+                                break;
+                            }
                         }
                     }
                     Err(term) => {
