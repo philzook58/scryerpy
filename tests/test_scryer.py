@@ -116,3 +116,20 @@ def test_libraries():
     """,
     )
     m.query("path(X,Y).")
+
+
+def test_query_prints_to_stdout(capfd):
+    machine = Machine()
+    assert machine.query_once("write('hello from scryer'), nl.") == {}
+    out, err = capfd.readouterr()
+    assert "hello from scryer" in out
+    assert err == ""
+
+
+def test_query_prints_multiple_lines_to_stdout(capfd):
+    machine = Machine()
+    machine.load_module_string("", ":- use_module(library(lists)).")
+    machine.query("member(X, [a,b,c]), write(X), nl.")
+    out, err = capfd.readouterr()
+    assert out.splitlines()[-3:] == ["a", "b", "c"]
+    assert err == ""

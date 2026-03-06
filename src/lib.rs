@@ -6,7 +6,7 @@ mod scryer {
     use num_rational::BigRational;
     use ordered_float::OrderedFloat;
     use pyo3::prelude::*;
-    use scryer_prolog::{LeafAnswer, Machine, MachineBuilder, Term};
+    use scryer_prolog::{LeafAnswer, Machine, MachineBuilder, StreamConfig, Term};
     use std::collections::HashMap;
     use std::fmt;
     use std::str::FromStr;
@@ -36,12 +36,15 @@ mod scryer {
         }
     }
 
+    // Would it be useful to have the stream callbacks?
     #[pymethods]
     impl PyMachine {
         #[new]
         fn new() -> Self {
             Self {
-                machine: MachineBuilder::default().build(),
+                machine: MachineBuilder::default()
+                    .with_streams(StreamConfig::stdio())
+                    .build(),
             }
         }
 
